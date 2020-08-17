@@ -46,9 +46,8 @@ int main(int argc, char *argv[]) {
     } else {
         PROCESS_INFORMATION information;
         HANDLE hFile;
-        DWORD dwNumberOfByteWritten;
-        string userInput;
-        hFile = CreateFile(FILE_NAME, GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS,
+        DWORD dwNumberOfByteWritten = 0;
+        hFile = CreateFile(FILE_NAME, FILE_WRITE_DATA, 0, nullptr, OPEN_ALWAYS,
                            FILE_ATTRIBUTE_NORMAL,
                            nullptr);
 
@@ -57,10 +56,11 @@ int main(int argc, char *argv[]) {
             return -1;
         }
         information = Process::startProcess(argv[0], READER_PROCESS_NAME);
+        RandomPicker randomPicker = RandomPicker();
         for (int i = 0; i < atoi(argv[1]); i++) {
-            string randomNumber = std::to_string(RandomPicker::getRandomNumber(1, 100)) + "\n";
-            cout << randomNumber;
-            WriteFile(hFile, randomNumber.c_str(), strlen(userInput.c_str()),
+            string randomNumber = std::to_string(randomPicker.getRandomNumber(1, 100)) + "\n";
+            cout << randomNumber << endl;
+            WriteFile(hFile, randomNumber.c_str(), strlen(randomNumber.c_str()),
                       &dwNumberOfByteWritten,
                       nullptr);
         }
