@@ -5,7 +5,8 @@
 class RandomPicker {
 public:
     RandomPicker();
-    static int getRandomNumber(int min, int max);
+
+    int getRandomNumber(int min, int max);
 };
 
 
