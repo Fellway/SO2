@@ -6,14 +6,43 @@
 #include "RandomPicker.h"
 #include "Calculator.h"
 #include <list>
+#include <strsafe.h>
 
 #define BUFFER_SIZE 1000
 #define READER_PROCESS_NAME "Reader"
 #define FILE_NAME "File.txt"
+#define MAX_THREADS 3
 
 static const char *const CORRECTOR = " ";
 
 using namespace std;
+
+typedef struct CalcData {
+    int operation;
+    int arrSize;
+    int *numbers;
+} CalcData, *PCalcData;
+
+
+DWORD WINAPI ThreadFunction(LPVOID lpParam) {
+    PCalcData pDataArray;
+
+    pDataArray = (PCalcData) lpParam;
+    switch (pDataArray->operation) {
+        case 0:
+            Calculator::avg(pDataArray->numbers, pDataArray->arrSize);
+            break;
+        case 1:
+            Calculator::max(pDataArray->numbers, pDataArray->arrSize);
+            break;
+        case 2:
+            Calculator::min(pDataArray->numbers, pDataArray->arrSize);
+            break;
+        default:
+            return -1;
+    }
+    return 0;
+}
 
 int *convertToNumbers(char *numbersAsChars, int *targetArray) {
     std::list<int> listOfNumbers;
@@ -34,9 +63,14 @@ char *readFile(HANDLE fileHandle, char *buffer) {
 }
 
 void monitor(int N) {
+    HANDLE hThreadArray[MAX_THREADS];
+    DWORD dwThreadIdArray[MAX_THREADS];
+    PCalcData pDataArray[MAX_THREADS];
+
     char readBuffer[BUFFER_SIZE] = {0};
     int numbers[BUFFER_SIZE] = {0};
     HANDLE hFile;
+
     bool lock = true;
     while (lock) {
         if (GetFileAttributes(FILE_NAME) != INVALID_FILE_ATTRIBUTES) {
@@ -47,9 +81,29 @@ void monitor(int N) {
                 lock = false;
                 readFile(hFile, readBuffer);
                 convertToNumbers(readBuffer, numbers);
-                Calculator::avg(numbers, N);
-                Calculator::max(numbers, N);
-                Calculator::min(numbers, N);
+
+                for (int i = 0; i < MAX_THREADS; i++) {
+                    pDataArray[i] = (PCalcData) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
+                                                          sizeof(CalcData));
+                    pDataArray[i]->numbers = numbers;
+                    pDataArray[i]->arrSize = N;
+                    pDataArray[i]->operation = i;
+                    hThreadArray[i] = CreateThread(NULL, 0, ThreadFunction, pDataArray[i], 0, &dwThreadIdArray[i]);
+
+                    if (hThreadArray[i] == NULL) {
+                        ExitProcess(3);
+                    }
+                }
+
+                WaitForMultipleObjects(MAX_THREADS, hThreadArray, TRUE, INFINITE);
+
+                for (int i = 0; i < MAX_THREADS; i++) {
+                    CloseHandle(hThreadArray[i]);
+                    if (pDataArray[i] != NULL) {
+                        HeapFree(GetProcessHeap(), 0, pDataArray[i]);
+                        pDataArray[i] = NULL;
+                    }
+                }
                 CloseHandle(hFile);
             }
         } else {
