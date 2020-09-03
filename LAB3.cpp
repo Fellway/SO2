@@ -37,7 +37,7 @@ void startProcess(char *path, const string &applicationName) {
                         nullptr,
                         &startupInfo,
                         &processInformation)
-             ) {
+            ) {
         printf("CreateProcess failed (%lu).\n", GetLastError());
     }
 }

@@ -3,7 +3,7 @@
 #include <ctime>
 
 RandomPicker::RandomPicker() {
-    srand ( time(NULL) );
+    srand(time(NULL));
 };
 
 int RandomPicker::getRandomNumber(int min, int max) {

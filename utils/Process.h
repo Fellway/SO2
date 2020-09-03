@@ -11,4 +11,4 @@ public:
 };
 
 
-#endif //SO2_PROCESS_H
+#endif
