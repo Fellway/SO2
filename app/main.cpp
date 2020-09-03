@@ -15,7 +15,7 @@ static const char *const CORRECTOR = " ";
 
 using namespace std;
 
-int* convertToNumbers(char *numbersAsChars, int *targetArray) {
+int *convertToNumbers(char *numbersAsChars, int *targetArray) {
     std::list<int> listOfNumbers;
 
     char *cds = strtok(numbersAsChars, CORRECTOR);
@@ -24,7 +24,6 @@ int* convertToNumbers(char *numbersAsChars, int *targetArray) {
         cds = strtok(NULL, CORRECTOR);
     }
     std::copy(listOfNumbers.begin(), listOfNumbers.end(), targetArray);
-    cout << targetArray[0] <<endl;
     return targetArray;
 }
 
@@ -93,6 +92,6 @@ int main(int argc, char *argv[]) {
             monitor(atoi(argv[1]));
         }
     } else {
-       writer(argv);
+        writer(argv);
     }
 }
