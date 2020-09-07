@@ -7,7 +7,7 @@
 #include "Calculator.h"
 #include <list>
 #include <strsafe.h>
-
+#include "../utils/Counter.h"
 #define BUFFER_SIZE 1000
 #define READER_PROCESS_NAME "Reader"
 #define FILE_NAME "File.txt"
@@ -66,7 +66,7 @@ void monitor(int N) {
     HANDLE hThreadArray[MAX_THREADS];
     DWORD dwThreadIdArray[MAX_THREADS];
     PCalcData pDataArray[MAX_THREADS];
-
+    Counter counter;
     char readBuffer[BUFFER_SIZE] = {0};
     int numbers[BUFFER_SIZE] = {0};
     HANDLE hFile;
@@ -81,6 +81,8 @@ void monitor(int N) {
                 lock = false;
                 readFile(hFile, readBuffer);
                 convertToNumbers(readBuffer, numbers);
+
+                counter.startCounter();
 
                 for (int i = 0; i < MAX_THREADS; i++) {
                     pDataArray[i] = (PCalcData) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
@@ -110,6 +112,7 @@ void monitor(int N) {
             cout << "File doesn't exist." << endl;
         }
     }
+    cout << counter.getCounter() << endl;
     CloseHandle(hFile);
     system("pause");
     exit(0);
