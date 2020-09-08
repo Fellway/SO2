@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Counter.h"
+#include "../headers/Counter.h"
 
 using namespace std;
 

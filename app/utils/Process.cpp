@@ -1,10 +1,9 @@
-#include "Process.h"
-#include <Windows.h>
+#include "../headers/Process.h"
+#include <windows.h>
 #include <string>
-
 using namespace std;
 
-PROCESS_INFORMATION Process::startProcess(char *path, char *N, const string &applicationName) {
+PROCESS_INFORMATION Process::startProcess(char *argv[], const string &applicationName) {
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
 
@@ -12,8 +11,8 @@ PROCESS_INFORMATION Process::startProcess(char *path, char *N, const string &app
     ZeroMemory(&processInformation, sizeof(processInformation));
 
     startupInfo.cb = sizeof(startupInfo);
-    string appPath(path);
-    string pathWithParam = appPath + " " + N + " " + applicationName;
+    string appPath(argv[0]);
+    string pathWithParam = appPath + " " + argv[1] + " " + argv[2] + " " + argv[3] + " " + applicationName;
 
     if (!CreateProcessA(appPath.c_str(),
                         const_cast<char *>(pathWithParam.c_str()),

@@ -14,4 +14,4 @@ public:
 };
 
 
-#endif //SO2_COUNTER_H
+#endif
