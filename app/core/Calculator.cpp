@@ -1,19 +1,19 @@
-#include <iostream>
-#include "Calculator.h"
+#include <cmath>
+#include "../headers/Calculator.h"
 
 using namespace std;
 
 Calculator::Calculator() = default;
 
-void Calculator::avg(const int *numbers, const int arraySize) {
+double Calculator::avg(const int *numbers, const int arraySize) {
     double sum = 0;
     for (int i = 0; i < arraySize; i++) {
         sum += *(numbers + i);
     }
-    printf("Avg of given numbers is: %.2f\n", sum / arraySize);
+    return std::ceil(sum / arraySize * 100.0) / 100.0;
 }
 
-void Calculator::min(const int *numbers, const int arraySize) {
+int Calculator::min(const int *numbers, const int arraySize) {
     int min = *(numbers);
     int number;
     for (int i = 1; i < arraySize; i++) {
@@ -22,10 +22,10 @@ void Calculator::min(const int *numbers, const int arraySize) {
             min = number;
         }
     }
-    printf("Min of given numbers is: %d\n", min);
+    return min;
 }
 
-void Calculator::max(const int *numbers, const int arraySize) {
+int Calculator::max(const int *numbers, const int arraySize) {
     int max = *(numbers);
     int number;
     for (int i = 1; i < arraySize; i++) {
@@ -34,5 +34,5 @@ void Calculator::max(const int *numbers, const int arraySize) {
             max = number;
         }
     }
-    printf("Max of given numbers is: %d\n", max);
+    return max;
 }
