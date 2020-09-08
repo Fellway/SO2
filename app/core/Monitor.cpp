@@ -20,38 +20,9 @@ typedef struct CalcResult {
     int min;
 } CalcResult, *PCalcResult;
 
-typedef struct CalcData {
-    int operation;
-    int arrSize;
-    int *numbers;
-    PCalcResult calcResult;
-} CalcData, *PCalcData;
-
-DWORD WINAPI ThreadFunction(LPVOID lpParam) {
-    PCalcData pDataArray;
-    pDataArray = (PCalcData) lpParam;
-    switch (pDataArray->operation) {
-        case 0:
-            pDataArray->calcResult->avg = Calculator::avg(pDataArray->numbers, pDataArray->arrSize);
-            break;
-        case 1:
-            pDataArray->calcResult->max = Calculator::max(pDataArray->numbers, pDataArray->arrSize);
-            break;
-        case 2:
-            pDataArray->calcResult->min = Calculator::min(pDataArray->numbers, pDataArray->arrSize);
-            break;
-        default:
-            return -1;
-    }
-    return 0;
-}
-
 void Monitor::init() {
     DWORD dwNumberOfByteWrittenSave = 0;
     DWORD dwNumberOfByteWrittenRead = 0;
-    HANDLE hThreadArray[MAX_THREADS];
-    DWORD dwThreadIdArray[MAX_THREADS];
-    PCalcData pDataArray[MAX_THREADS];
     int numbers[BUFFER_SIZE] = {0};
     char readBuffer[BUFFER_SIZE] = {0};
     int rangedNumbers[BUFFER_SIZE] = {0};
@@ -88,32 +59,14 @@ void Monitor::init() {
                     for (int k = 0; k < this->numberOfNumbers; k++) {
                         rangedNumbers[k] = numbers[j * this->numberOfNumbers + k];
                     }
-                    for (int i = 0; i < MAX_THREADS; i++) {
-                        pDataArray[i] = (PCalcData) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
-                                                              sizeof(CalcData));
-                        pDataArray[i]->numbers = rangedNumbers;
-                        pDataArray[i]->arrSize = this->numberOfNumbers;
-                        pDataArray[i]->operation = i;
-                        pDataArray[i]->calcResult = &calcResult;
-                        hThreadArray[i] = CreateThread(NULL, 0, ThreadFunction, pDataArray[i], 0, &dwThreadIdArray[i]);
 
-                        if (hThreadArray[i] == NULL) {
-                            ExitProcess(3);
-                        }
-                    }
-
-                    WaitForMultipleObjects(MAX_THREADS, hThreadArray, TRUE, INFINITE);
+                    calcResult.avg = Calculator::avg(rangedNumbers, this->numberOfNumbers);
+                    calcResult.max = Calculator::max(rangedNumbers, this->numberOfNumbers);
+                    calcResult.min = Calculator::min(rangedNumbers, this->numberOfNumbers);
 
                     std::string tableRow = FileText::getTableRow(j, calcResult.min, calcResult.max, calcResult.avg);
                     WriteFile(hMonitorFile, tableRow.c_str(), strlen(tableRow.c_str()), &dwNumberOfByteWrittenSave, nullptr);
 
-                    for (int i = 0; i < MAX_THREADS; i++) {
-                        CloseHandle(hThreadArray[i]);
-                        if (pDataArray[i] != NULL) {
-                            HeapFree(GetProcessHeap(), 0, pDataArray[i]);
-                            pDataArray[i] = NULL;
-                        }
-                    }
                 }
                 CloseHandle(hMonitorFile);
             }

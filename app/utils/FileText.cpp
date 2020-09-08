@@ -6,7 +6,7 @@ std::string FileText::getHeader(const int numberOfNumbers, const int pauseTime, 
     SYSTEM_INFO siSysInfo;
     GetSystemInfo(&siSysInfo);
     std::ostringstream oss;
-    oss << "Total numbers: " << numberOfNumbers << " | Version: Multithreads \nMachine: "
+    oss << "Total numbers: " << numberOfNumbers << " | Version: Single-threading \nMachine: "
         << "\n\tNumber of processors: " << siSysInfo.dwNumberOfProcessors
         << "\n\tPage size: " << siSysInfo.dwPageSize
         << "\n\tProcessor type: " << siSysInfo.dwProcessorType
